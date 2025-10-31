@@ -38,7 +38,7 @@ read_surf           data.orion.txt
 surf_collide        1 adiabatic
 surf_modify         all collide 1
 
-collide             vss air air.vss
+collide             qct air air.vss
 react               tce air.tce
 
 fix                 in emit/face air xlo nevery 1 twopass

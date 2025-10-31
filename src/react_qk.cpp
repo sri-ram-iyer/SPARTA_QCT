@@ -37,8 +37,8 @@ ReactQK::ReactQK(SPARTA *sparta, int narg, char **arg) :
 
 void ReactQK::init()
 {
-  if (!collide || strcmp(collide->style,"vss") != 0)
-    error->all(FLERR,"React qk can only be used with collide vss");
+  if (!collide || (strcmp(collide->style,"vss") != 0 && strcmp(collide->style,"qct") != 0))
+    error->all(FLERR,"React qk can only be used with collide vss or qct");
 
   ReactBird::init();
 
