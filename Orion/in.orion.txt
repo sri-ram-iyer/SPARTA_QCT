@@ -1,0 +1,77 @@
+seed                12345
+dimension           2
+global              gridcut 0.0 comm/sort yes
+
+boundary            o o p
+
+create_box          -5.0 10.0 -10.0 10.0 -0.5 0.5
+create_grid         750 1000 1
+balance_grid        block 1 1 1
+
+global              nrho 8.46e18
+global              fnum 1.00e14
+
+species             air.species N2 O2 N O NO O2+ N2+ O+ N+ NO+
+mixture             air N2 O2 N O vstream 7600 0 0 temp 211.0
+mixture             air N2 frac 0.78
+mixture             air O2 frac 0.22
+mixture             air N frac 0.00
+mixture             air O frac 0.00
+mixture             air NO frac 0.00
+mixture             air O2+ frac 0.00
+mixture             air N2+ frac 0.00
+mixture             air O+ frac 0.00
+mixture             air N+ frac 0.00
+mixture             air NO+ frac 0.00
+mixture             N2 N2
+mixture             O2 O2
+mixture             N N
+mixture             O O
+mixture             NO NO
+mixture             O2_1Plus O2+
+mixture             N2_1Plus N2+
+mixture             O_1Plus O+
+mixture             N_1Plus N+
+mixture             NO_1Plus NO+
+
+read_surf           data.orion.txt
+surf_collide        1 adiabatic
+surf_modify         all collide 1
+
+collide             vss air air.vss
+react               tce air.tce
+
+fix                 in emit/face air xlo nevery 1 twopass
+
+timestep            1.0e-6
+
+compute		nrho grid all air nrho
+compute		temp0 grid all air temp
+compute		u grid all air u
+compute		v grid all air v
+compute		N2 grid all N2 nrho
+compute		O2 grid all O2 nrho
+compute		N grid all N nrho
+compute		O grid all O nrho
+compute		NO grid all NO nrho
+compute		O2_1Plus grid all O2_1Plus nrho
+compute		N2_1Plus grid all N2_1Plus nrho
+compute		O_1Plus grid all O_1Plus nrho
+compute		N_1Plus grid all N_1Plus nrho
+compute		NO_1Plus grid all NO_1Plus nrho
+compute     temp thermal/grid all air temp
+dump		dg grid all 100 orion.%.* id xc yc vol c_nrho[*] c_temp0[*] c_u[*] c_v[*] c_temp[*] c_N2[*] c_O2[*] c_N[*] c_O[*] c_NO[*] c_O2_1Plus[*] c_N2_1Plus[*] c_O_1Plus[*] c_N_1Plus[*] c_NO_1Plus[*]
+dump_modify     dg fileper 1
+
+# compute	cs surf all all fx fy fz press
+# dump		ds surf all 100 hypersonic.surf.% id area c_cs[*]
+# dump		ds surf all 100 hypersonic.surf.* id area c_cs[*]
+
+# dump                dimg image all 200 image.*.ppm type type pdiam 0.1 &
+#                     surf proc 0.01 size 512 512 zoom 1.75 &
+#                     gline yes 0.005
+# dump_modify         dimg pad 4 fileperproc 0 nfile 1
+
+stats               100
+stats_style         step cpu np nattempt ncoll nscoll nscheck
+run                 500
